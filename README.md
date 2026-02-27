@@ -167,6 +167,70 @@ print(report.summary())
 | `arena.integrations` | PM4Py, variant analysis, performance overlays |
 | `arena.cli` | Command-line interface |
 
+## Related Projects
+
+System Arena builds on ideas from these open-source projects:
+
+| Project | Purpose |
+|---------|---------|
+| [Temporal](https://github.com/temporalio/temporal) | Workflow orchestration and durable execution |
+| [PM4Py](https://github.com/pm4py/pm4py-core) | Process mining algorithms and analysis |
+| [Retentioneering](https://github.com/retentioneering/retentioneering-tools) | User behavior and clickstream analysis |
+| [Langfuse](https://github.com/langfuse/langfuse) | LLM observability and tracing |
+| [LangGraph](https://github.com/langchain-ai/langgraph) | Agent orchestration with state machines |
+| [SimPy](https://github.com/simpy/simpy) | Discrete-event process simulation |
+| [Camunda/Zeebe](https://github.com/camunda/zeebe) | BPMN workflow engine |
+
+## Architecture Resources
+
+Recommended reading for understanding the architectural patterns used:
+
+- [awesome-software-architecture](https://github.com/mehdihadeli/awesome-software-architecture) — Comprehensive architecture patterns
+- [architecture-decision-record](https://github.com/joelparkerhenderson/architecture-decision-record) — ADR templates and examples
+- [domain-driven-design-roadmap](https://github.com/masoud-bahrami/domain-driven-design-roadmap) — DDD learning path
+- [awesome-cqrs-event-sourcing](https://github.com/leandrocp/awesome-cqrs-event-sourcing) — CQRS and event sourcing resources
+
+## Using in Your Project
+
+Each workflow/use-case should be a separate repository that depends on `system-arena`:
+
+```bash
+# In your workflow repository
+pip install system-arena
+```
+
+Your repository structure:
+
+```
+my-workflow/
+├── manifest.yaml          # Workflow definition
+├── data/
+│   └── events.parquet     # Historical event log
+├── policies/
+│   └── my_policy.py       # Custom policies
+└── analysis/
+    └── notebooks/         # Analysis notebooks
+```
+
+See the [Usage](#usage) section for code examples.
+
+## Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/system-arena.git`
+3. Install dev dependencies: `pip install -e ".[dev]"`
+4. Create a branch: `git checkout -b feature/your-feature`
+5. Make changes and add tests
+6. Run checks: `ruff check . && mypy src/`
+7. Submit a pull request
+
+Please ensure your PR:
+- Follows existing code style
+- Includes tests for new functionality
+- Updates documentation if needed
+
 ## License
 
 MIT

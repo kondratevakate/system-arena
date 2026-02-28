@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Sequence
 
 from arena.decision.extractor import DecisionPoint
 from arena.decision.labeler import OutcomeCategory
 from arena.replay.trace import ExecutionTrace, TraceCollection
+
+if TYPE_CHECKING:
+    from arena.feedback import LessonStore
 
 
 @dataclass
@@ -49,6 +52,7 @@ class MetricsSummary:
 def compute_metrics(
     traces: TraceCollection,
     decision_points: Sequence[DecisionPoint] | None = None,
+    lesson_store: LessonStore | None = None,
 ) -> MetricsSummary:
     """
     Compute all standard metrics from execution traces.
@@ -56,6 +60,7 @@ def compute_metrics(
     Args:
         traces: Collection of execution traces
         decision_points: Original decision points (for outcome labels)
+        lesson_store: Optional LessonStore to check metrics against known issues
 
     Returns:
         MetricsSummary with all computed metrics
@@ -69,23 +74,64 @@ def compute_metrics(
     ))
 
     # Violation metrics
-    summary.add(compute_violation_rate(traces))
+    violation_rate = compute_violation_rate(traces)
+    _apply_lesson_checks(violation_rate, lesson_store)
+    summary.add(violation_rate)
 
     # Historical match rate
-    summary.add(compute_historical_match_rate(traces))
+    match_rate = compute_historical_match_rate(traces)
+    _apply_lesson_checks(match_rate, lesson_store)
+    summary.add(match_rate)
 
     # Outcome-based metrics (if outcomes are labeled)
     if _has_outcomes(traces):
-        summary.add(compute_positive_outcome_rate(traces))
-        summary.add(compute_conversion_rate(traces))
+        positive_rate = compute_positive_outcome_rate(traces)
+        _apply_lesson_checks(positive_rate, lesson_store)
+        summary.add(positive_rate)
+
+        conversion = compute_conversion_rate(traces)
+        _apply_lesson_checks(conversion, lesson_store)
+        summary.add(conversion)
 
     # Action diversity
-    summary.add(compute_action_entropy(traces))
+    entropy = compute_action_entropy(traces)
+    _apply_lesson_checks(entropy, lesson_store)
+    summary.add(entropy)
 
     # Confidence metrics
-    summary.add(compute_average_confidence(traces))
+    confidence = compute_average_confidence(traces)
+    _apply_lesson_checks(confidence, lesson_store)
+    summary.add(confidence)
 
     return summary
+
+
+def _apply_lesson_checks(
+    metric: MetricResult,
+    lesson_store: LessonStore | None,
+) -> None:
+    """Apply lesson checks to a metric and add warnings to metadata."""
+    if lesson_store is None:
+        return
+
+    from arena.feedback import check_metrics
+
+    sample_size = metric.metadata.get("total", 0)
+    if sample_size == 0:
+        sample_size = metric.metadata.get("labeled", 0)
+    if sample_size == 0:
+        sample_size = metric.metadata.get("count", 0)
+
+    result = check_metrics(
+        lesson_store,
+        metric=metric.name,
+        value=metric.value,
+        sample_size=sample_size,
+    )
+
+    if result.has_warnings:
+        metric.metadata["warnings"] = result.warnings
+        metric.metadata["matched_lessons"] = result.matched_lessons
 
 
 def compute_precision_at_k(

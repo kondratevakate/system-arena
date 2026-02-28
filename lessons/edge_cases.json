@@ -1,0 +1,67 @@
+{
+  "lessons": [
+    {
+      "id": "lesson_001",
+      "pattern": "zero_denominator",
+      "applies_to": ["conversion_rate", "segment_comparison", "ab_test"],
+      "rule": "When denominator is 0, report 'Insufficient data' not '0%' or 'no effect'",
+      "check": "sample_size == 0",
+      "warning": "Cannot calculate rate: empty segment (sample_size=0)",
+      "source_issue": "",
+      "added_at": "2026-02-28T00:00:00",
+      "examples": [
+        {
+          "wrong": "Feature conversion: 0/0 = 0%",
+          "correct": "Insufficient data (no users in segment)",
+          "context": {
+            "domain": "telegram_bot",
+            "users": 700,
+            "segment_users": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "lesson_002",
+      "pattern": "small_sample",
+      "applies_to": ["all_metrics"],
+      "rule": "When n < 30, add low confidence warning",
+      "check": "sample_size < 30",
+      "warning": "Low confidence: sample size {n} < 30",
+      "source_issue": "",
+      "added_at": "2026-02-28T00:00:00",
+      "examples": [
+        {
+          "wrong": "Segment has 100% conversion (3/3)",
+          "correct": "100% conversion (n=3, low confidence)",
+          "context": {
+            "domain": "e-commerce",
+            "users": 500,
+            "segment_users": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "lesson_003",
+      "pattern": "missing_event_type",
+      "applies_to": ["funnel_analysis"],
+      "rule": "Check if expected events exist before analyzing",
+      "check": "event_count == 0",
+      "warning": "Event type not found - check if logged",
+      "source_issue": "",
+      "added_at": "2026-02-28T00:00:00",
+      "examples": [
+        {
+          "wrong": "0 language_selected events - users have no language preference",
+          "correct": "Event not logged by system",
+          "context": {
+            "domain": "telegram_bot",
+            "expected_events": ["start", "language_selected", "purchase"],
+            "actual_events": ["start", "purchase"]
+          }
+        }
+      ]
+    }
+  ]
+}

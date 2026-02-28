@@ -1,0 +1,146 @@
+name: Analysis Feedback
+description: Report when arena's analysis was incorrect so we can learn from it
+title: "[Feedback]: "
+labels: [feedback]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Arena! Please describe the analysis error you encountered.
+        **Privacy**: All information is anonymous - do not include project names, user names, or identifying data.
+
+  - type: dropdown
+    id: system_type
+    attributes:
+      label: System Type
+      description: What type of system was being analyzed?
+      options:
+        - Telegram bot
+        - Web application
+        - Mobile app
+        - Desktop app
+        - API/Backend service
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Domain
+      description: What domain/industry?
+      options:
+        - E-commerce
+        - Travel
+        - Education
+        - Healthcare
+        - Finance
+        - SaaS/Productivity
+        - Social/Community
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: user_count
+    attributes:
+      label: Approximate User Count
+      description: How many unique users in the dataset?
+      placeholder: "e.g., ~700"
+    validations:
+      required: true
+
+  - type: input
+    id: event_count
+    attributes:
+      label: Approximate Event Count
+      description: How many events in total?
+      placeholder: "e.g., ~2000"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: metric
+    attributes:
+      label: Which metric was affected?
+      options:
+        - conversion_rate
+        - historical_match_rate
+        - positive_outcome_rate
+        - action_entropy
+        - segment_comparison
+        - funnel_analysis
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pattern
+    attributes:
+      label: What caused the error?
+      options:
+        - Zero denominator (0/0)
+        - Small sample size (n < 30)
+        - Missing event types
+        - Data quality issue
+        - Logic error
+        - Edge case not handled
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: wrong_interpretation
+    attributes:
+      label: What arena reported (incorrect)
+      description: The incorrect conclusion or metric value
+      placeholder: |
+        e.g., "Feature X does not help conversion (0.0% vs 5.0%)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: correct_interpretation
+    attributes:
+      label: What the correct interpretation is
+      description: What should have been reported instead
+      placeholder: |
+        e.g., "Insufficient data to evaluate Feature X - no users adopted it"
+    validations:
+      required: true
+
+  - type: textarea
+    id: root_cause
+    attributes:
+      label: Root Cause
+      description: Why did the error occur?
+      placeholder: |
+        e.g., "Arena assumed 0/0 = 0% instead of 'undefined/insufficient data'"
+    validations:
+      required: true
+
+  - type: textarea
+    id: rule
+    attributes:
+      label: Rule to Prevent This
+      description: What rule should arena follow to avoid this error?
+      placeholder: |
+        e.g., "When denominator is 0, report 'Insufficient data' instead of calculating a rate"
+    validations:
+      required: true
+
+  - type: textarea
+    id: events_context
+    attributes:
+      label: Event Types Context (optional)
+      description: What event types existed, were missing, or were added?
+      placeholder: |
+        Original events: start, menu_view, purchase
+        Missing events: language_selected (not logged)
+        Added after analysis: feature_interaction
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context (optional)
+      description: Any other relevant information about the analysis error
